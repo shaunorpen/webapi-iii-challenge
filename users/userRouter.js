@@ -70,7 +70,7 @@ router.delete("/:id", validateUserId, (req, res) => {
 
 router.put("/:id", validateUserId, (req, res) => {
   users
-    .update(req.user.id, req.body)
+    .update(req.user.id, { ...req.user, name: req.body.name })
     .then(data => {
       res.status(200).json(data);
     })
