@@ -5,19 +5,19 @@ const users = require("./userDb");
 router.post("/", (req, res) => {
   users
     .insert(req.body)
-    .then(
-      data => {
-        res.status(201).json(data);
-      }
-    )
+    .then(data => {
+      res.status(201).json(data);
+    })
     .catch(error => {
       res.status(500).json({
-        message: "Something went wrong adding the user to the database: " + error.message,
-      })
-    })
+        message:
+          "Something went wrong adding the user to the database: " +
+          error.message
+      });
+    });
 });
 
-router.post("/:id/posts", (req, res) => {});
+router.post("/:id/posts", validateUserId, (req, res) => {});
 
 router.get("/", (req, res) => {
   users
@@ -34,18 +34,32 @@ router.get("/", (req, res) => {
     });
 });
 
-router.get("/:id", (req, res) => {});
+router.get("/:id", validateUserId, (req, res) => {});
 
-router.get("/:id/posts", (req, res) => {});
+router.get("/:id/posts", validateUserId, (req, res) => {});
 
-router.delete("/:id", (req, res) => {});
+router.delete("/:id", validateUserId, (req, res) => {});
 
-router.put("/:id", (req, res) => {});
+router.put("/:id", validateUserId, (req, res) => {});
 
 function validateUserId(req, res, next) {
-  // - `validateUserId` validates the user id on every request that expects a user id parameter
-  // - if the `id` parameter is valid, store that user object as `req.user`
-  // - if the `id` parameter does not match any user id in the database, cancel the request and respond with status `400` and `{ message: "invalid user id" }`
+  users
+    .getById(req.params.id)
+    .then(data => {
+      if (data) {
+        req.user = data;
+        next();
+      } else {
+        res.status(400).json({ message: "invalid user id" });
+      }
+    })
+    .catch(error => {
+      res.status(500).json({
+        message:
+          "There was a problem retrieving the user with id x from the database: " +
+          error.message
+      });
+    });
 }
 
 function validateUser(req, res, next) {
