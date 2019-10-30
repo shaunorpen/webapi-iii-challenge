@@ -17,7 +17,9 @@ router.post("/", validateUser, (req, res) => {
     });
 });
 
-router.post("/:id/posts", validateUserId, (req, res) => {});
+router.post("/:id/posts", validateUserId, validatePost, (req, res) => {
+  //implement
+});
 
 router.get("/", (req, res) => {
   users
@@ -76,9 +78,17 @@ function validateUser(req, res, next) {
 }
 
 function validatePost(req, res, next) {
-  // - `validatePost` validates the `body` on a request to create a new post
-  // - if the request `body` is missing, cancel the request and respond with status `400` and `{ message: "missing post data" }`
-  // - if the request `body` is missing the required `text` field, cancel the request and respond with status `400` and `{ message: "missing required text field" }`
+  const post = Object.keys(req.body);
+  if (post.length) {
+    if (post.includes("text")) {
+      req.post = req.body;
+      next();
+    } else {
+      res.status(400).json({ message: "missing required text field" });
+    }
+  } else {
+    res.status(400).json({ message: "missing post data" });
+  }
 }
 
 module.exports = router;
