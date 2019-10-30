@@ -36,11 +36,37 @@ router.get("/", (req, res) => {
     });
 });
 
-router.get("/:id", validateUserId, (req, res) => {});
+router.get("/:id", validateUserId, (req, res) => {
+  res.status(200).json(req.user);
+});
 
-router.get("/:id/posts", validateUserId, (req, res) => {});
+router.get("/:id/posts", validateUserId, (req, res) => {
+  users
+    .getUserPosts(req.user.id)
+    .then(data => {
+      res.status(200).json(data);
+    })
+    .catch(error => {
+      res.status(500).json({
+        message:
+          "There was a problem retrieving posts from the database: " +
+          error.message
+      });
+    });
+});
 
-router.delete("/:id", validateUserId, (req, res) => {});
+router.delete("/:id", validateUserId, (req, res) => {
+  users
+    .remove(req.user.id)
+    .then(data => {
+      res.status(200).json(data);
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: "There was a problem deleting the user: " + error.message
+      });
+    });
+});
 
 router.put("/:id", validateUserId, (req, res) => {});
 
