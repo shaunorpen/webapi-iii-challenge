@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const users = require("./userDb");
+const posts = require("../posts/postDb");
 
 router.post("/", validateUser, (req, res) => {
   users
@@ -18,7 +19,18 @@ router.post("/", validateUser, (req, res) => {
 });
 
 router.post("/:id/posts", validateUserId, validatePost, (req, res) => {
-  //implement
+  posts
+    .insert({ ...req.post, user_id: req.user.id })
+    .then(data => {
+      res.status(201).json(data);
+    })
+    .catch(error => {
+      res.status(500).json({
+        message:
+          "Something went wrong adding the post to the database: " +
+          error.message
+      });
+    });
 });
 
 router.get("/", (req, res) => {
