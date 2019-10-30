@@ -68,7 +68,18 @@ router.delete("/:id", validateUserId, (req, res) => {
     });
 });
 
-router.put("/:id", validateUserId, (req, res) => {});
+router.put("/:id", validateUserId, (req, res) => {
+  users
+    .update(req.user.id, req.body)
+    .then(data => {
+      res.status(200).json(data);
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: "There was a problem updating the user: " + error.message
+      });
+    });
+});
 
 function validateUserId(req, res, next) {
   users
