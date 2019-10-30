@@ -80,9 +80,9 @@ router.delete("/:id", validateUserId, (req, res) => {
     });
 });
 
-router.put("/:id", validateUserId, (req, res) => {
+router.put("/:id", validateUserId, validateUpdatedUser, (req, res) => {
   users
-    .update(req.user.id, { ...req.user, name: req.body.name })
+    .update(req.user.id, req.updatedUser)
     .then(data => {
       res.status(200).json(data);
     })
@@ -117,6 +117,22 @@ function validateUser(req, res, next) {
   if (Object.keys(req.body).length) {
     if (Object.keys(req.body).includes("name")) {
       req.user = req.body;
+      next();
+    } else {
+      res.status(400).json({ message: "missing required name field" });
+    }
+  } else {
+    res.status(400).json({ message: "missing user data" });
+  }
+}
+
+function validateUpdatedUser(req, res, next) {
+  if (Object.keys(req.body).length) {
+    if (Object.keys(req.body).includes("name")) {
+      req.updatedUser = {
+        ...req.body,
+        id: req.user.id
+      };
       next();
     } else {
       res.status(400).json({ message: "missing required name field" });
