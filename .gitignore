@@ -59,3 +59,6 @@ typings/
 
 # Mac files
 .DS_Store
+.vscode/launch.json
+.eslintrc.js
+package-lock.json
